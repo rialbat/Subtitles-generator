@@ -5,6 +5,7 @@ import speech_recognition as sr
 import librosa
 import argparse
 import os
+import soundfile as sf
 from glob import glob
 
 def get_arguments():
@@ -16,7 +17,7 @@ def get_arguments():
 
 def recognize(wav_filename):
     data, s = librosa.load(wav_filename)
-    librosa.output.write_wav('tmp.wav', data, s)
+    sf.write('tmp.wav', data, s)
     y = (np.iinfo(np.int32).max * (data/np.abs(data).max())).astype(np.int32)
     wavfile.write('tmp_32.wav', s, y)
 
@@ -46,7 +47,7 @@ def split_into_frames(audiofile):
     print('video duration, hours: {}'.format(duration/3600))
     for i in range(0,int(duration-1),50):
         tmp_batch = data[(i)*sr:sr*(i+50)]
-        librosa.output.write_wav('samples/{}.wav'.format(chr(int(i/50)+65)), tmp_batch, sr)
+        sf.write('samples/{}.wav'.format(chr(int(i/50)+65)), tmp_batch, sr)
 
 if __name__ == '__main__':
     start = time.time()
@@ -61,4 +62,4 @@ if __name__ == '__main__':
         recognize(file)
     end = time.time()
     print('elapsed time: {}'.format(end - start))
-    os.system('rm samples/*')
+    os.system('del /f /q samples\*.*')
